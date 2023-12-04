@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:api-led-integration-system-api="http://www.mulesoft.org/schema/mule/api-led-integration-system-api" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/api-led-integration-system-api http://www.mulesoft.org/schema/mule/api-led-integration-system-api/current/mule-api-led-integration-system-api.xsd">
+    <apikit:config name="api-led-integration-processapi-config" api="resource::346c1acb-2698-4c0a-b3fe-d50443e0d2da:api-led-integration-processapi:1.0.0:raml:zip:api-led-integration-processapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<api-led-integration-system-api:config name="API_Led_Integration_SystemAPI_Config" doc:name="API-Led-Integration-SystemAPI Config" doc:id="82d424a8-7f7a-4060-bcca-f8e372eb1fa8" property_host="${calculator.host}" property_port="${calculator.port}" property_protocol="${calculator.protocol}" property_basePath="${calculator.basePath}" />
+
+	<flow name="api-led-integration-processapi-main" doc:id="d665299c-f53f-409d-b664-c9c2e3bc308a">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-led-integration-processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="api-led-integration-processapi-console">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-led-integration-processapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\flights\price-per-seat:api-led-integration-processapi-config">
+		<http:request method="GET" doc:name="Request" doc:id="6afada62-cf50-4038-8100-b61daab35993" config-ref="HTTP_Request_configuration" path="${flights.path}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client_secret" : "4a87fe7e2e43488c927372AEF981F066",
+	"client_id" : "d1374b15c6864c3682ddbed2a247a826"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"destination" : attributes.queryParams.destination
+}]]]></http:query-params>
+		</http:request>
+		<set-variable value="#[[]]" doc:name="Set Data" doc:id="ea3a3591-6141-42c8-b39e-9af12119c794" variableName="data"/>
+		<foreach doc:name="For Each" doc:id="8cbccbe3-569b-456e-991d-d7455fe697a7" collection="#[payload]">
+			<set-variable value="#[payload]" doc:name="Set Record" doc:id="55f3c63b-9b69-4218-b2f7-8232e3f2fa47" variableName="record"/>
+			<api-led-integration-system-api:get-subtracts doc:name="Get subtracts" doc:id="771ad9ab-5933-43d6-8585-0e9aa8c14730" config-ref="API_Led_Integration_SystemAPI_Config" int-a="#[payload.plane.totalSeats]" int-b="#[payload.emptySeats]"/>
+			<api-led-integration-system-api:get-multiplies doc:name="Get multiplies" doc:id="fd10a519-2d3a-47e0-a762-df77a0eeb5c0" config-ref="API_Led_Integration_SystemAPI_Config" int-a="#[payload]" int-b="#[vars.record.price]"/>
+			<ee:transform doc:name="Transform Message" doc:id="d33ff1f4-bc2f-4f5e-9202-0a3faecc120b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.record ++ {"pricePerSeat": payload}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<set-variable value="#[output application/json&#10;---&#10;vars.data &lt;&lt; payload]" doc:name="Set Data" doc:id="5cdde56d-34b3-4e7f-aead-ad10d4683de2" variableName="data" />
+		</foreach>
+		<ee:transform doc:name="toResponse">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+vars.data groupBy ((item, index) -> item.destination) mapObject ((value, key, index) -> {
+    "destination": key,
+    "planes": value groupBy ((item, index) -> item.plane."type") 
+    pluck ((value, key, index) -> {
+        "type": key,
+        "pricePerSeat": sum(flatten(value.pricePerSeat)) as Number
+    })
+})]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+</mule>

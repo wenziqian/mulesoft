@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="88a01635-ef1d-4c3b-acd6-2145719d119a" file="properties/${env}.yaml" />
+	<wsc:config name="Web_Service_Consumer_Config_Operation" doc:name="Web Service Consumer Config" doc:id="41d2a871-7183-4566-afb8-6bdb5b05e064" >
+		<wsc:connection soapVersion="SOAP12" wsdlLocation="${calculator.wsdl}" service="${calculator.service}" port="${calculator.port}" address="${calculator.address}"/>
+	</wsc:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8a6a8612-b22b-43d7-a23e-beeb2b1f945e" >
+		<http:listener-connection host="${systemapi.host}" port="${systemapi.port}" />
+	</http:listener-config>
+	<global-property doc:name="Global Property" doc:id="787181f5-3c50-4914-a0c7-e36dc70131f4" name="env" value="local" />
+</mule>

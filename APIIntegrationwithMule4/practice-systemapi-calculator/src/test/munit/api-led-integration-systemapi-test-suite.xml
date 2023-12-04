@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="api-led-integration-systemapi-test-suite.xml" />
+	<munit:test name="api-led-integration-systemapi-test-suite-api-led-integration-systemapi-mainTest" doc:id="b221b1ac-6c4e-418a-b713-144ef56b5bef" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to api-led-integration-systemapi-main" doc:id="8ab91236-edbc-4313-adc3-19301b6c5324" name="api-led-integration-systemapi-main"/>
+		</munit:execution>
+	</munit:test>
+
+</mule>

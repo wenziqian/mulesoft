@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="subtract-flow" doc:id="f8f63c0d-7a1e-4973-9524-e7f95b08a856" >
+		<ee:transform doc:name="substract-xml" doc:id="f5284252-8aa5-4901-bd7d-2ac49c0491ce" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Subtract: {
+		ns0#intA: vars.intA,
+		ns0#intB: vars.intB
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="Subtract" doc:id="46596e24-a80c-45d5-a391-c547c694b0cc" config-ref="Web_Service_Consumer_Config_Operation" doc:name="Substract" />
+		<ee:transform doc:name="xml2json" doc:id="1add0802-ec58-41a1-99e7-0a270e6ff181" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload..SubtractResult[0]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="multi-flow" doc:id="2fd522f7-7f9c-4ab1-811a-ea726750123d" >
+		<ee:transform doc:name="multiply-xml" doc:id="d49c4421-2c89-490c-91c1-d5e667ff3055" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Multiply: {
+		ns0#intA: vars.intA,
+		ns0#intB: vars.intB
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="Multiply" doc:name="Multiply" doc:id="e9cc105e-bbba-4824-9e3e-ca4fb3d208b3" config-ref="Web_Service_Consumer_Config_Operation" />
+		<ee:transform doc:name="xml2json" doc:id="b91ec17d-b63d-4d56-ab12-2469247aaf16" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload..MultiplyResult]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

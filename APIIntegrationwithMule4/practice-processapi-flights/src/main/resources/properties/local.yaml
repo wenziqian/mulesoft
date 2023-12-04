@@ -1,0 +1,14 @@
+calculator:
+  host: "127.0.0.1"
+  port: "8081"
+  protocol: "HTTP"
+  basePath: "/api"
+flights:
+  host: "training4-american-ws.cloudhub.io"
+  port: "80"
+  bathPath: "/api"
+  path: "/flights"
+  Protocol: HTTP
+processapi:
+  host: "localhost"
+  port: "9090"

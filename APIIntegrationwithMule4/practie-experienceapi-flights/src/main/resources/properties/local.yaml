@@ -1,0 +1,11 @@
+experience:
+  host: "127.0.0.1"
+  port: "9091"
+  protocol: "HTTP"
+  path: "/flights"
+
+flights:
+  host: "127.0.0.1"
+  port: "9090"
+  Protocol: "HTTP"
+  basePath: "/api"

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="54399cb3-7c68-40de-b189-2eedc7a4b877" file="properties/${env}.yaml" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b8f32857-e76d-4f4b-ae20-a6b05177baa6" >
+		<http:listener-connection host="${processapi.host}" port="${processapi.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="a26ce3c4-1809-40e6-b966-2c801878ce14" basePath="/api">
+		<http:request-connection host="${flights.host}" port="${flights.port}" protocol="${flights.Protocol}"/>
+	</http:request-config>
+	<global-property doc:name="Global Property" doc:id="c0e7bafb-be7b-46d5-bb5e-de30a80b24a8" name="env" value="local" />
+	
+</mule>

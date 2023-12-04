@@ -1,0 +1,16 @@
+
+american-flights:
+  host: "http://training4-american-ws.cloudhub.io"
+  port: "80"
+  base_path: "/api"
+  path: "/flights"
+  
+calculator:
+  wsdl: "http://www.dneonline.com/calculator.asmx?WSDL"
+  service: "Calculator"
+  port: "CalculatorSoap12"
+  address: "http://www.dneonline.com/calculator.asmx"
+
+systemapi:
+  host: "localhost"
+  port: "8081"

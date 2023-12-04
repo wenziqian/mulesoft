@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-led-integration-process-api="http://www.mulesoft.org/schema/mule/api-led-integration-process-api" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/api-led-integration-process-api http://www.mulesoft.org/schema/mule/api-led-integration-process-api/current/mule-api-led-integration-process-api.xsd">
+
+	<api-led-integration-process-api:config name="API_Led_Integration_ProcessAPI_Config" doc:name="API-Led-Integration-ProcessAPI Config" doc:id="84bfb1e8-47b6-43bf-be2d-16a5ad6ff5e1" property_host="${flights.host}" property_port="${flights.port}" property_protocol="${flights.Protocol}" property_basePath="${flights.basePath}" />
+	<flow name="practie-experienceapi-flightsFlow" doc:id="44a52f32-0740-498b-9605-7d8fccf14f10" >
+		<http:listener doc:name="Listener" doc:id="049cded2-a4ef-46d1-afac-9fdb3bdac0c4" config-ref="HTTP_Listener_config" path="${experience.path}"/>
+		<api-led-integration-process-api:get-price-per-seats doc:id="c9a18469-8415-441e-bf9f-0392544c714c" doc:name="get price-per-seat" config-ref="API_Led_Integration_ProcessAPI_Config" destination="#[attributes.queryParams.destination]" client-id="#[attributes.headers.client_id]" client-secret="#[attributes.headers.client_secret]"/>
+	</flow>
+</mule>
