@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:core="http://www.mulesoft.org/schema/mule/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<flow name="process-customer-accounts-recordsFlow" doc:id="6d5fdbe6-8365-41fd-8539-eb4b941c1ae0" >
+		<scheduler doc:name="Scheduler" doc:id="de9d8aa3-2455-4cc6-adff-3ad159ed2a9c" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<os:retrieve doc:name="Retrieve" doc:id="362128ec-129b-4535-a988-9d9da68e2f07" key="lastAccountID">
+			<os:default-value><![CDATA[0]]></os:default-value>
+		</os:retrieve>
+		<db:select doc:name="accounts" doc:id="4c85893a-a212-41ff-b2de-31a41053a493" config-ref="MySQL_Database_Config" >
+			<db:sql ><![CDATA[SELECT * FROM accounts WHERE accountID > :lastAccountID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{postal: Mule::p("dbquery.postal"), lastAccountID: vars.lastAccountID}]]]></db:input-parameters>
+		</db:select>
+		<set-variable value="#[payload groupBy $.country]" doc:name="Set Countries" doc:id="1b061580-5a87-4de7-9d26-a061750ba76a" variableName="countries"/>
+		<choice doc:name="Choice" doc:id="d1ee4f5c-e389-4c54-ae36-21a1a22747fe" >
+			<when expression="#[not isEmpty(payload)]" >
+				<os:store doc:name="lastAccountID" doc:id="e647ed6d-9db6-4c21-9530-0a43370bdfa8" key="lastAccountID" >
+					<os:value ><![CDATA[#[max(payload.*accountID)]]]></os:value>
+				</os:store>
+				<foreach doc:name="For Each" doc:id="7669c33f-0a5a-4ff2-aff0-9ffd7a91da8c" collection="#[vars.countries]">
+					<set-variable value='#[Mule::p("accounts.folder.out") ++ "diy_auto_wm/"++ &#10;Mule::p("accounts.filename.prefix") ++ "-" ++ &#10;dw::core::Strings::dasherize(vars.countries[vars.counter] as String) ++ "-" ++&#10;now() as String {format: "yyyyMMdd"} ++&#10;Mule::p("accounts.filename.ext")]' doc:name="Set FileName" doc:id="c30172b8-bf34-4c4c-9e6e-5fbdb5bdbe2b" variableName="fileName"/>
+					<set-variable value="#[payload filter ($.country == '')]" doc:name="accountsOfCountry" doc:id="02ecea24-ddb6-4672-8ff4-944c213fc7da" variableName="accountsOfCountry"/>
+					<file:write doc:name="DBaccountsPostal.csv" doc:id="12027025-2e61-4894-8fd8-1e3e7653b11d" config-ref="File_Config" path="#[vars.fileName]" mode="APPEND">
+					<file:content><![CDATA[#[output application/csv header=false 
+--- 
+payload filter($.country == vars.countries[vars.counter])]]]></file:content>
+				</file:write>
+					<logger level="INFO" doc:name="CSV payload" doc:id="78157d05-4705-4622-b9db-6379121097a6" message="#[output application/csv --- payload]" />
+				</foreach>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="No new records" doc:id="d6a665a0-8d09-4283-9084-4a731160d8c3" message="No new records" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="read-db-accounts-to-csv-auto-watermarking" doc:id="42a1e0d9-98b1-4453-b67a-d893d87ec487" initialState="stopped">
+		<db:listener doc:name="customers_flights" doc:id="055ee0ee-673d-46b1-b391-5b509c393b4e" config-ref="MySQL_Database_Config" table="flights_customers" watermarkColumn="accountID">
+			<scheduling-strategy>
+				<fixed-frequency frequency="5" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</db:listener>
+		<set-variable value='#[Mule::p("accounts.folder.out") ++ "diy_auto_wm/"++ &#10;Mule::p("accounts.filename.prefix") ++ "-" ++ &#10;dw::core::Strings::dasherize(payload.country as String) ++ "-" ++&#10;now() as String {format: "yyyyMMdd"} ++&#10;Mule::p("accounts.filename.ext")]' doc:name="fileName" doc:id="1a237b93-3a53-4c84-8e20-bc4361e2f087" variableName="fileName"/>
+		<file:write doc:id="1bde07a9-c54e-42ab-8b85-7e1bc833792b" doc:name="Accounts per country per date" path="#[vars.fileName]" mode="APPEND">
+			<file:content ><![CDATA[#[output application/csv header=false
+---
+payload]]]></file:content>
+		</file:write>
+		<logger level="INFO" doc:name="Logger" doc:id="d0c2a8ee-c4e9-43ec-a85a-fd844fd1fe7f" message="#[output application/json --- {
+	filename: vars.fileName,
+	p: payload
+}]"/>
+	</flow>
+</mule>

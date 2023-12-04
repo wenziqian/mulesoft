@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="0a97e960-10d8-42f2-9ac3-5c3c5c67281a" file="config.yaml" />
+	<db:config name="MySQL_Database_Config" doc:name="Database Config" doc:id="921205ad-4e7a-4933-85ea-2c93b7c180f6" >
+		<db:generic-connection url="${database.url}" driverClassName="${database.driverclass}" />
+	</db:config>
+	<flow name="globalFlow1" doc:id="92cee263-88df-492c-8ab6-cd896bb892b4" >
+		<db:listener doc:name="On Table Row" doc:id="bc500464-64ee-4459-bd87-821efef1a9be" config-ref="MySQL_Database_Config" table="flights_customers" watermarkColumn="accountID" idColumn="accountID">
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</db:listener>
+	</flow>
+	<flow name="globalFlow" doc:id="6be651ce-f6fa-4210-b194-5aef3fa8dac9" >
+		<scheduler doc:name="Scheduler" doc:id="0ac5e3b1-a1b0-49c7-94f0-2cd1e5f91e17" >
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</scheduler>
+		<os:retrieve doc:name="Retrieve" doc:id="3a1e14e7-bfd7-49b5-b1fe-0cfe18cd50fe" />
+	</flow>
+</mule>

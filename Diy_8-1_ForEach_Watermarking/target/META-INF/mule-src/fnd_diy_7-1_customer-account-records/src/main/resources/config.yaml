@@ -1,0 +1,17 @@
+database:
+  url: "jdbc:mysql://mudb.learn.mulesoft.com:3306/training?user=mule&password=mule"
+  driverclass: "com.mysql.cj.jdbc.Driver"
+  
+db:
+  host: "mudb.learn.mulesoft.com"
+  port: "3306"
+  user: "mule"
+  password: "mule"
+  database: "training"
+  
+accounts:
+  folder:
+    out: "tmp/output/"
+  filename:
+      prefix: "customer-accounts"
+      ext: ".csv"

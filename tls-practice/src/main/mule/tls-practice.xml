@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a9b33794-56ef-468d-bff3-3f293534472c" >
+		<http:listener-connection host="localhost" port="8082" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store type="jks" path="/Users/wenyuejun/trust-key-store/localhost.keystore" alias="localhost" keyPassword="changeit" password="changeit" />
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config_client" doc:name="HTTP Listener config" doc:id="246201d5-6680-4e5a-b147-d196b1a3a07a" >
+		<http:listener-connection host="127.0.0.1" port="9090" >
+		</http:listener-connection>
+	</http:listener-config>
+	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="cdc3f5dd-20aa-40f7-868b-f5a23377cf1b" >
+		<tls:trust-store path="/Users/wenyuejun/trust-key-store/ken_trust.jks" password="zacard7" type="jks"/>
+	</tls:context>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9336a661-7f9d-48e9-97ca-9c2de25fb58c" >
+		<http:request-connection protocol="HTTPS" host="localhost" port="8082" tlsContext="TLS_Context" />
+	</http:request-config>
+	<flow name="API1" doc:id="6582741c-eba8-44b4-a14a-930e55488481" >
+		<http:listener doc:name="Listener" doc:id="c64a2f9e-1f1a-4431-a911-9d702f81cb8d" config-ref="HTTP_Listener_config_client" path="/tls"/>
+		<http:request method="GET" doc:name="Request" doc:id="2e80ab36-c8f6-4c65-b232-e9497a6f9c40" config-ref="HTTP_Request_configuration" path="/rsa"/>
+	</flow>
+	<flow name="API2" doc:id="6c6e18c8-f726-4aca-b79a-05728f0a847e" >
+		<http:listener doc:name="Listener" doc:id="0115f121-3e35-4bf9-8317-9d0894b4f08c" config-ref="HTTP_Listener_config" path="/rsa"/>
+		<set-payload value='#["Hello Client"]' doc:name="Set Payload" doc:id="40359754-9276-4225-a3b7-9565a7fbb400" />
+	</flow>
+</mule>
